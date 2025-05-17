@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:notes_app/modules/sign_in/view/sign_in_view.dart';
+import 'package:notes_app/presentation/pages/sign_in/view/sign_in_view.dart';
 
 class SignInPage extends StatelessWidget {
   const SignInPage({super.key});

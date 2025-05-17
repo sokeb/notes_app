@@ -13,6 +13,18 @@ class App extends StatelessWidget {
           backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         ),
         useMaterial3: true,
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.amber),
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            minimumSize: const Size.fromHeight(50),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+            backgroundColor: Colors.amber,
+            foregroundColor: Colors.black,
+            textStyle: const TextStyle(fontSize: 18),
+          ),
+        ),
       ),
       routerConfig: AppRouter().router,
     );

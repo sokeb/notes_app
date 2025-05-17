@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:notes_app/modules/splash_sceen/view/splash_screen_view.dart';
+import 'package:notes_app/presentation/pages/splash_sceen/view/splash_screen_view.dart';
 
 class SplashPage extends StatelessWidget {
   const SplashPage({super.key});

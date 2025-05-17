@@ -1,16 +1,18 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../controller/auth_controller.dart';
+import 'package:go_router/go_router.dart';
+import '../../../controller/auth_controller.dart';
 
-class SignInView extends StatelessWidget {
+class SignUpView extends StatelessWidget {
   final _formKey = GlobalKey<FormState>();
   final authController = Get.find<AuthController>();
 
+  final nameController = TextEditingController();
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
 
-  SignInView({super.key});
+  SignUpView({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -24,13 +26,24 @@ class SignInView extends StatelessWidget {
               shrinkWrap: true,
               children: [
                 Text(
-                  'Login',
+                  'Register',
                   style: Theme.of(context).textTheme.headlineLarge?.copyWith(
                     color: Colors.amber,
                     fontStyle: FontStyle.italic,
-                  ),
-                ),
+                  ),),
                 const SizedBox(height: 32),
+
+                TextFormField(
+                  controller: nameController,
+                  decoration: const InputDecoration(labelText: 'Name'),
+                  validator:
+                      (val) =>
+                          val != null && val.isNotEmpty
+                              ? null
+                              : 'Enter your name',
+                ),
+
+                const SizedBox(height: 16),
 
                 TextFormField(
                   controller: emailController,
@@ -53,35 +66,29 @@ class SignInView extends StatelessWidget {
                       (val) =>
                           val != null && val.length >= 6
                               ? null
-                              : 'Password must be at least 6 characters',
+                              : 'Password too short',
                 ),
 
                 const SizedBox(height: 24),
 
                 ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    minimumSize: const Size.fromHeight(50),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    backgroundColor: Colors.amber,
-                    foregroundColor: Colors.black,
-                  ),
                   onPressed: () {
                     if (_formKey.currentState!.validate()) {
-                      authController.login(
+                      authController.register(
+                        nameController.text.trim(),
                         emailController.text.trim(),
                         passwordController.text.trim(),
                       );
                     }
                   },
-                  child: const Text('Login', style: TextStyle(fontSize: 18)),
+                  child: const Text('Register'),
                 ),
 
                 const SizedBox(height: 12),
+
                 RichText(
                   text: TextSpan(
-                    text: "Don't have an account? ",
+                    text: "Already have an account? ",
                     // Fixed typo in "Powered by"
                     style: TextStyle(
                       fontFamily: 'Inter',
@@ -91,7 +98,7 @@ class SignInView extends StatelessWidget {
                     ),
                     children: [
                       TextSpan(
-                        text: 'Register',
+                        text: 'Login',
                         style: TextStyle(
                           fontFamily: 'Inter',
                           fontSize: 16,
@@ -101,7 +108,7 @@ class SignInView extends StatelessWidget {
                         recognizer:
                             TapGestureRecognizer()
                               ..onTap = () {
-                                Get.toNamed('/register');
+                                context.goNamed('sign_in');
                               },
                       ),
                     ],
