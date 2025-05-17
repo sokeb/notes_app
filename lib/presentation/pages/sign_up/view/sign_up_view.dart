@@ -30,7 +30,8 @@ class SignUpView extends StatelessWidget {
                   style: Theme.of(context).textTheme.headlineLarge?.copyWith(
                     color: Colors.amber,
                     fontStyle: FontStyle.italic,
-                  ),),
+                  ),
+                ),
                 const SizedBox(height: 32),
 
                 TextFormField(
@@ -72,13 +73,28 @@ class SignUpView extends StatelessWidget {
                 const SizedBox(height: 24),
 
                 ElevatedButton(
-                  onPressed: () {
+                  onPressed: () async {
                     if (_formKey.currentState!.validate()) {
-                      authController.register(
+                      final success = await authController.register(
                         nameController.text.trim(),
                         emailController.text.trim(),
                         passwordController.text.trim(),
                       );
+
+                      if (context.mounted) {
+                        if (success) {
+                          context.pushReplacementNamed('home');
+                        } else {
+                          // Show error message
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text(
+                                'Register failed. Please try again.',
+                              ),
+                            ),
+                          );
+                        }
+                      }
                     }
                   },
                   child: const Text('Register'),

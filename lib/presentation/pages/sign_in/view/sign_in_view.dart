@@ -61,12 +61,24 @@ class SignInView extends StatelessWidget {
                 const SizedBox(height: 24),
 
                 ElevatedButton(
-                  onPressed: () {
+                  onPressed: () async {
                     if (_formKey.currentState!.validate()) {
-                      authController.login(
+                      final success = await authController.login(
                         emailController.text.trim(),
                         passwordController.text.trim(),
                       );
+                      if (context.mounted) {
+                        if (success) {
+                          context.pushReplacementNamed('home');
+                        } else {
+                          // Show error message
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Login failed. Please try again.'),
+                            ),
+                          );
+                        }
+                      }
                     }
                   },
                   child: const Text('Login', style: TextStyle(fontSize: 18)),
