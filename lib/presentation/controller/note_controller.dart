@@ -20,15 +20,15 @@ class NoteController extends GetxController {
     try {
       final uid = FirebaseAuth.instance.currentUser?.uid;
       if (uid != null) {
-        final snapshot = await FirebaseFirestore.instance
-            .collection('users')
-            .doc(uid)
-            .collection('notes')
-            .get();
+        final snapshot =
+            await FirebaseFirestore.instance
+                .collection('users')
+                .doc(uid)
+                .collection('notes')
+                .get();
 
-        notes.value = snapshot.docs
-            .map((doc) => NoteModel.fromFirestore(doc))
-            .toList();
+        notes.value =
+            snapshot.docs.map((doc) => NoteModel.fromFirestore(doc)).toList();
       }
     } catch (e) {
       Get.snackbar('Error', 'Failed to load notes');
@@ -37,8 +37,28 @@ class NoteController extends GetxController {
     }
   }
 
-  void logout() async {
-    await FirebaseAuth.instance.signOut();
-    Get.offAllNamed('/login');
+  Future<bool> addNote(String title, String description) async {
+    try {
+      final uid = FirebaseAuth.instance.currentUser?.uid;
+      if (uid == null) return false;
+
+      final note = {
+        'title': title,
+        'description': description,
+        'createdAt': FieldValue.serverTimestamp(),
+      };
+
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(uid)
+          .collection('notes')
+          .add(note);
+
+      fetchNotes(); // refresh notes after adding
+      return true;
+    } catch (e) {
+      Get.snackbar('Error', 'Failed to add note');
+      return false;
+    }
   }
 }
