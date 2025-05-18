@@ -8,18 +8,20 @@ class NoteController extends GetxController {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   List<NoteModel> _notes = [];
-  bool _isLoading = false;
+  bool _isLoading = true;
 
   List<NoteModel> get notes => _notes;
 
   bool get loading => _isLoading;
 
+  @override
+  void onInit() {
+    super.onInit();
+    fetchNotes();
+  }
+
   Future<void> fetchNotes() async {
     if (_auth.currentUser == null) return;
-
-    _isLoading = true;
-    update();
-
     try {
       final snapshot =
           await _firestore

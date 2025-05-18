@@ -5,10 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../domain/model/note_model.dart';
 import '../../../controller/controller.dart';
 
-
-
 class HomeView extends StatefulWidget {
-
   const HomeView({super.key});
 
   @override
@@ -42,35 +39,36 @@ class _HomeViewState extends State<HomeView> {
           ),
         ],
       ),
-      body: GetBuilder<NoteController>(builder: (noteController) {
-        if (noteController.loading) {
-          return const Center(child: CircularProgressIndicator());
-        }
+      body: GetBuilder<NoteController>(
+        builder: (noteController) {
+          final notes = noteController.notes;
 
-        final notes = noteController.notes;
-
-        if (notes.isEmpty) {
-          return const Center(child: Text("No notes yet"));
-        }
-
-        return ListView.builder(
-          itemCount: notes.length,
-          itemBuilder: (_, index) {
-            final NoteModel note = notes[index];
-            return Card(
-              margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              child: ListTile(
-                title: Text(note.title),
-                subtitle: Text(
-                  note.description,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-            );
-          },
-        );
-      }),
+          return noteController.loading
+              ? const Center(child: CircularProgressIndicator())
+              : notes.isEmpty
+              ? const Center(child: Text("No notes yet"))
+              : ListView.builder(
+                itemCount: notes.length,
+                itemBuilder: (_, index) {
+                  final NoteModel note = notes[index];
+                  return Card(
+                    margin: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
+                    child: ListTile(
+                      title: Text(note.title),
+                      subtitle: Text(
+                        note.description,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  );
+                },
+              );
+        },
+      ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           context.pushNamed('note_entry');
@@ -82,8 +80,7 @@ class _HomeViewState extends State<HomeView> {
 
   Future<void> getNotes() async {
     final noteController = Get.find<NoteController>();
-      await noteController.fetchNotes();
+    await noteController.fetchNotes();
     return;
   }
-
 }
