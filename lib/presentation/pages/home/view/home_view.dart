@@ -26,7 +26,8 @@ class _HomeViewState extends State<HomeView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Your Notes'),
+          title: const Text('My Notes'),
+          centerTitle: true,
         actions: [
           IconButton(
             icon: const Icon(Icons.logout),
@@ -39,36 +40,65 @@ class _HomeViewState extends State<HomeView> {
           ),
         ],
       ),
-      body: GetBuilder<NoteController>(
-        builder: (noteController) {
-          final notes = noteController.notes;
+        body: GetBuilder<NoteController>(
+          builder: (noteController) {
+            final notes = noteController.notes;
 
-          return noteController.loading
-              ? const Center(child: CircularProgressIndicator())
-              : notes.isEmpty
-              ? const Center(child: Text("No notes yet"))
-              : ListView.builder(
-                itemCount: notes.length,
-                itemBuilder: (_, index) {
-                  final NoteModel note = notes[index];
-                  return Card(
-                    margin: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 8,
+            if (noteController.loading) {
+              return const Center(child: CircularProgressIndicator());
+            } else if (notes.isEmpty) {
+              return const Center(child: Text("No notes available", style: TextStyle(fontSize: 18)));
+            }
+
+            return ListView.builder(
+              padding: const EdgeInsets.all(16),
+              itemCount: notes.length,
+              itemBuilder: (_, index) {
+                final NoteModel note = notes[index];
+                return GestureDetector(
+                  onTap: () {
+                    context.pushNamed('note_detail', extra: note);
+                  },
+                  child: Container(
+                    margin: const EdgeInsets.only(bottom: 12),
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black12,
+                          blurRadius: 6,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
                     ),
-                    child: ListTile(
-                      title: Text(note.title),
-                      subtitle: Text(
-                        note.description,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          note.title,
+                          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          note.description,
+                          maxLines: 3,
+                          overflow: TextOverflow.ellipsis,
+                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            color: Colors.grey[700],
+                          ),
+                        ),
+                      ],
                     ),
-                  );
-                },
-              );
-        },
-      ),
+                  ),
+                );
+              },
+            );
+          },
+        ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           context.pushNamed('note_entry');
