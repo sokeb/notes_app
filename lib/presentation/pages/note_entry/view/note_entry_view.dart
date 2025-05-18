@@ -28,8 +28,8 @@ class NoteEntryView extends StatelessWidget {
                   labelText: 'Title',
                   border: OutlineInputBorder(),
                 ),
-                validator: (value) =>
-                value!.isEmpty ? 'Please enter a title' : null,
+                validator:
+                    (value) => value!.isEmpty ? 'Please enter a title' : null,
               ),
               const SizedBox(height: 16),
               TextFormField(
@@ -39,8 +39,9 @@ class NoteEntryView extends StatelessWidget {
                   border: OutlineInputBorder(),
                 ),
                 maxLines: 4,
-                validator: (value) =>
-                value!.isEmpty ? 'Please enter a description' : null,
+                validator:
+                    (value) =>
+                        value!.isEmpty ? 'Please enter a description' : null,
               ),
               const SizedBox(height: 24),
               SizedBox(
@@ -62,11 +63,14 @@ class NoteEntryView extends StatelessWidget {
                       );
 
                       if (success && context.mounted) {
-                        context.pop; // go back to home
+                        context.pushReplacementNamed('home'); // go back to home
                       }
                     }
                   },
-                  child: const Text('Save Note', style: TextStyle(fontSize: 18)),
+                  child: const Text(
+                    'Save Note',
+                    style: TextStyle(fontSize: 18),
+                  ),
                 ),
               ),
             ],

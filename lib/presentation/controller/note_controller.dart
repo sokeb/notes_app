@@ -46,21 +46,17 @@ class NoteController extends GetxController {
   }
 
   Future<bool> addNote(String title, String description) async {
-    if (_auth.currentUser == null) return false;
-
     try {
       final note = {
         'title': title.trim(),
         'description': description.trim(),
         'createdAt': FieldValue.serverTimestamp(),
       };
-
       await _firestore
           .collection('users')
           .doc(_auth.currentUser!.uid)
           .collection('notes')
           .add(note);
-
       await fetchNotes();
       return true;
     } catch (e) {
@@ -72,4 +68,5 @@ class NoteController extends GetxController {
       return false;
     }
   }
+
 }
