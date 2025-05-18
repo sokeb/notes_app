@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../domain/model/note_model.dart';
-import '../../../controller/note_controller.dart';
+import '../../../controller/controller.dart';
+
 
 class HomeView extends StatelessWidget {
   final noteController = Get.find<NoteController>();
+  final authController = Get.find<AuthController>();
 
   HomeView({super.key});
 
@@ -17,7 +19,12 @@ class HomeView extends StatelessWidget {
         actions: [
           IconButton(
             icon: const Icon(Icons.logout),
-              onPressed: () async {}
+            onPressed: () async {
+              final success = await authController.signOut();
+              if (success && context.mounted) {
+                context.pushReplacementNamed('sign_in');
+              }
+            },
           ),
         ],
       ),

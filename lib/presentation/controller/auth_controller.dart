@@ -41,4 +41,14 @@ class AuthController extends GetxController {
       return false;
     }
   }
+  Future<bool> signOut() async {
+    try {
+      await FirebaseAuth.instance.signOut();
+      return true;
+    } catch (e) {
+      Get.snackbar('Error', 'Logout failed');
+      return false;
+    }
+  }
+
 }
