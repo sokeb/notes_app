@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:go_router/go_router.dart';
+import '../../../controller/controller.dart';
 
 class SplashView extends StatefulWidget {
   const SplashView({super.key});
@@ -9,12 +11,19 @@ class SplashView extends StatefulWidget {
 }
 
 class _SplashViewState extends State<SplashView> {
+  final SplashController _splashController = Get.find<SplashController>();
+
   @override
   void initState() {
     super.initState();
-    Future<void>.delayed(const Duration(seconds: 1), () {
-      if (mounted) context.goNamed('sign_in');
-    });
+    _checkAuthAndNavigate();
+  }
+
+  Future<void> _checkAuthAndNavigate() async {
+    final isUser = await _splashController.checkUser();
+    if (mounted) {
+      context.pushReplacementNamed(isUser ? 'home' : 'sign_in');
+    }
   }
 
   @override

@@ -1,15 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:go_router/go_router.dart';
+
 import '../../../../domain/model/note_model.dart';
 import '../../../controller/controller.dart';
 
 
-class HomeView extends StatelessWidget {
+
+class HomeView extends StatefulWidget {
+
+  const HomeView({super.key});
+
+  @override
+  State<HomeView> createState() => _HomeViewState();
+}
+
+class _HomeViewState extends State<HomeView> {
   final noteController = Get.find<NoteController>();
   final authController = Get.find<AuthController>();
 
-  HomeView({super.key});
+  @override
+  void initState() {
+    super.initState();
+    getNotes();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,8 +42,8 @@ class HomeView extends StatelessWidget {
           ),
         ],
       ),
-      body: Obx(() {
-        if (noteController.isLoading.value) {
+      body: GetBuilder<NoteController>(builder: (noteController) {
+        if (noteController.loading) {
           return const Center(child: CircularProgressIndicator());
         }
 
@@ -65,4 +79,11 @@ class HomeView extends StatelessWidget {
       ),
     );
   }
+
+  Future<void> getNotes() async {
+    final noteController = Get.find<NoteController>();
+      await noteController.fetchNotes();
+    return;
+  }
+
 }

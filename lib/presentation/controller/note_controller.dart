@@ -1,63 +1,72 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
-
 import '../../domain/model/note_model.dart';
 
 class NoteController extends GetxController {
-  final RxList<NoteModel> notes = <NoteModel>[].obs;
-  final isLoading = false.obs;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  @override
-  void onInit() {
-    super.onInit();
-    fetchNotes();
-  }
+  List<NoteModel> _notes = [];
+  bool _isLoading = false;
 
-  void fetchNotes() async {
-    isLoading.value = true;
+  List<NoteModel> get notes => _notes;
+
+  bool get loading => _isLoading;
+
+  Future<void> fetchNotes() async {
+    if (_auth.currentUser == null) return;
+
+    _isLoading = true;
+    update();
 
     try {
-      final uid = FirebaseAuth.instance.currentUser?.uid;
-      if (uid != null) {
-        final snapshot =
-            await FirebaseFirestore.instance
-                .collection('users')
-                .doc(uid)
-                .collection('notes')
-                .get();
+      final snapshot =
+          await _firestore
+              .collection('users')
+              .doc(_auth.currentUser!.uid)
+              .collection('notes')
+              .orderBy('createdAt', descending: true)
+              .get();
 
-        notes.value =
-            snapshot.docs.map((doc) => NoteModel.fromFirestore(doc)).toList();
-      }
+      _notes =
+          snapshot.docs.map((doc) => NoteModel.fromFirestore(doc)).toList();
     } catch (e) {
-      Get.snackbar('Error', 'Failed to load notes');
+      Get.snackbar(
+        'Error',
+        'Failed to load notes',
+        snackPosition: SnackPosition.BOTTOM,
+      );
     } finally {
-      isLoading.value = false;
+      _isLoading = false;
+      update();
     }
   }
 
   Future<bool> addNote(String title, String description) async {
-    try {
-      final uid = FirebaseAuth.instance.currentUser?.uid;
-      if (uid == null) return false;
+    if (_auth.currentUser == null) return false;
 
+    try {
       final note = {
-        'title': title,
-        'description': description,
+        'title': title.trim(),
+        'description': description.trim(),
         'createdAt': FieldValue.serverTimestamp(),
       };
 
-      await FirebaseFirestore.instance
+      await _firestore
           .collection('users')
-          .doc(uid)
+          .doc(_auth.currentUser!.uid)
           .collection('notes')
           .add(note);
 
-      fetchNotes(); // refresh notes after adding
+      await fetchNotes();
       return true;
     } catch (e) {
-      Get.snackbar('Error', 'Failed to add note');
+      Get.snackbar(
+        'Error',
+        'Failed to add note',
+        snackPosition: SnackPosition.BOTTOM,
+      );
       return false;
     }
   }
