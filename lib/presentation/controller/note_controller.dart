@@ -1,11 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
+import '../../data/services/firestore_service.dart';
 import '../../domain/model/note_model.dart';
 
 class NoteController extends GetxController {
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final _firestoreService = FirestoreService();
 
   List<NoteModel> _notes = [];
   bool _isLoading = true;
@@ -21,18 +20,8 @@ class NoteController extends GetxController {
   }
 
   Future<void> fetchNotes() async {
-    if (_auth.currentUser == null) return;
     try {
-      final snapshot =
-          await _firestore
-              .collection('users')
-              .doc(_auth.currentUser!.uid)
-              .collection('notes')
-              .orderBy('createdAt', descending: true)
-              .get();
-
-      _notes =
-          snapshot.docs.map((doc) => NoteModel.fromFirestore(doc)).toList();
+      _notes = await _firestoreService.getNotes();
     } catch (e) {
       Get.snackbar(
         'Error',
@@ -52,11 +41,7 @@ class NoteController extends GetxController {
         'description': description.trim(),
         'createdAt': FieldValue.serverTimestamp(),
       };
-      await _firestore
-          .collection('users')
-          .doc(_auth.currentUser!.uid)
-          .collection('notes')
-          .add(note);
+      await _firestoreService.addNote(note);
       await fetchNotes();
       return true;
     } catch (e) {
@@ -68,5 +53,4 @@ class NoteController extends GetxController {
       return false;
     }
   }
-
 }

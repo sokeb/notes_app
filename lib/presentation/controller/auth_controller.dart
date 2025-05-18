@@ -1,13 +1,12 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import '../../data/services/firebase_auth_service.dart';
 
 class AuthController extends GetxController {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final _firebaseAuthService = FirebaseAuthService();
 
   Future<bool> login(String email, String password) async {
     try {
-      await _auth.signInWithEmailAndPassword(email: email, password: password);
+      await _firebaseAuthService.signIn(email, password);
       return true;
     } catch (e) {
       Get.snackbar(
@@ -21,17 +20,12 @@ class AuthController extends GetxController {
 
   Future<bool> register(String name, String email, String password) async {
     try {
-      final cred = await _auth.createUserWithEmailAndPassword(
+      await _firebaseAuthService.register(
+        name: name,
         email: email,
         password: password,
       );
-
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(cred.user!.uid)
-          .set({'name': name, 'email': email});
-
-      return true; // ✅ return success
+      return true;
     } catch (e) {
       Get.snackbar(
         'Registration Failed',
@@ -41,14 +35,14 @@ class AuthController extends GetxController {
       return false;
     }
   }
+
   Future<bool> signOut() async {
     try {
-      await FirebaseAuth.instance.signOut();
+      await _firebaseAuthService.signOut();
       return true;
     } catch (e) {
       Get.snackbar('Error', 'Logout failed');
       return false;
     }
   }
-
 }
